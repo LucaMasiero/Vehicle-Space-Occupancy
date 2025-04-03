@@ -103,7 +103,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 0:
         if sys.argv[1] == "-file":
             #process single image, then the path refers to an image
-            taillight_detection, plate_corners = main(sys.argv[2])
+            taillights_centers, plate_corners = main(sys.argv[2])
         elif sys.argv[1] == "-dir":
             #process all images in directory, then the path refers to a directory
-            taillight_detection, plate_corners = main(sys.argv[2], dir=True)
+            taillights_centers, plate_corners = main(sys.argv[2], dir=True)
