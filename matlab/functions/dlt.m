@@ -18,9 +18,6 @@ function A = dlt(x,y,dim)
 %   A = A / norm(A);
 %   A - dlt(x,A*x) % should be a small number
 %
-% By Hsiang-Jen (Johnny) Chien (jchien@aut.ac.nz) from Centre of Robotics and
-% Vision (CeRV), Auckland University of Technology, New Zealand.
-%
 [n,k ] = size(x);
 [m,ky] = size(y);
 if nargin < 3, q = m; else q = dim; end

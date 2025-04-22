@@ -2,17 +2,17 @@ clear
 close all
 addpath("matlab\functions\")
 
-iPhone = false;
-manualExtraction = true;
+iPhone = true;
+manualExtraction = false;
 
 % Feature extraction
 pyenv('Version', "C:\Users\luca1\miniconda3\envs\py3.12\python.exe");
 %addpath(fileparts(fullfile(pwd, "./matlab/scripts/main.m")))
 
 if iPhone
-    img_path = "./imgs/pandina/iPhone/panda_3.jpg";
+    img_path = "./imgs/pandina/iPhone/panda_7.jpg";
 else
-    img_path = "./imgs/ibiza/nothing2a/seat_1.jpg";
+    img_path = "./imgs/ibiza/nothing2a/seat_6.jpg";
 end
 
 if manualExtraction
@@ -38,8 +38,8 @@ else
 
     original_image_points = double( [left_taillight_center;
                             right_taillight_center;
-                            plate_ul;
-                            plate_ur]);
+                            plate_ur;
+                            plate_ul]);
 end
 
 %% Localization
@@ -87,15 +87,8 @@ end
 % y upward
 world_points = [taillights_d/2, 0;
                 -taillights_d/2, 0;
-                plate_length/2, -height;
-                -plate_length/2, -height];
-
-% x to the right
-% y downward
-%world_points = [-taillights_d/2, 0;
-%                taillights_d/2, 0;
-%                -plate_length/2, height;
-%                plate_length/2, height];
+                -plate_length/2, -height;
+                plate_length/2, -height;];
 
 if normalize
     % Normalize image and world points for numerical stability
@@ -132,10 +125,6 @@ r3 = cross(r1,r2);
 
 % direction of the world axis with respect to the camera frame
 R = [r1, r2, r3];
-if det(R) == -1
-    % negate all columns to ensure proper rotation matrix
-    R = -R;
-end
 
 % due to noise in the data R may be not a true rotation matrix.
 % approximate it through svd, obtaining an orthogonal matrix
@@ -154,16 +143,31 @@ cameraRotation = R.'
 % reference frame where R.' is the rotation of the camera wrt the plane
 cameraPosition = -R.' * T
 
+%% Plot result (with plotly)
+fig = figure(1);
 
-%% Plot result with plotly
-
-%% Using Matlab function 'estworldpose'
-undistortedPoints = undistortPoints(image_points,cameraParams.Intrinsics);
-worldPose = estworldpose(undistortedPoints,world_points,cameraParams.Intrinsics);
-
-pcshow(worldPoints,VerticalAxis="Y",VerticalAxisDir="down", ...
-    MarkerSize=30);
+% plot origin of world reference frame
+scatter3(0,0,0, '.', 'filled');
 hold on
-plotCamera(Size=10,Orientation=worldPose.R', ...
-    Location=worldPose.Translation);
-hold off
+% Plot quadrangolar of features, passing coordinates in this order: Z-X-Y
+patch(zeros(4,1), world_points(:,1), world_points(:,2), 'blue');
+hold on
+% plot camera
+r1 = cameraRotation(:,1);
+r2 = cameraRotation(:,2);
+r3 = cameraRotation(:,3);
+
+plotCamera('location', [cameraPosition(3); cameraPosition(1); cameraPosition(2)], ...
+                        'orientation', [r3,r1,r2]', 'size', 50);
+%plotCamera('location', cameraPosition, 'orientation', cameraRotation, 'size', 20);
+hold on
+
+% Pay attention to the naming convention used
+% the reference frame used by matlab does not correspond with the one used
+% by our localization algorithm
+xlabel('Distance')
+xlim([-5000, 1000])
+ylabel('Lateral Distance')
+ylim([-2000,2000])
+zlabel('Height')
+zlim([-500, 2000])
