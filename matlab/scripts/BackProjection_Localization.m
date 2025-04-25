@@ -47,13 +47,13 @@ end
 %% Retrieve points from image
 close all
 clear
-img_path = "./imgs/pandina/iPhone/panda.jpg";
-%img_path = "./imgs/pandina/nothing2a/panda_10.jpg";
+%img_path = "./imgs/pandina/iPhone/panda.jpg";
+img_path = "./imgs/pandina/nothing2a/panda_10.jpg";
 image = imread(img_path);
 
 %load('selected_points.mat', 'x', 'y');      % the order is up-left, up-right, botton-right, bottom-left
-load("./matlab/data/iPhone_camera_params.mat") 
-%load("./matlab/data/nothing2a_camera_params_LR.mat")
+%load("./matlab/data/iPhone_camera_params.mat") 
+load("./matlab/data/nothing2a_camera_params_LR.mat")
 K = cameraParams.Intrinsics.K;     % camear calibration amtrix
 pp = cameraParams.Intrinsics.PrincipalPoint;
 
@@ -155,12 +155,74 @@ quiver3(0,0,0, Y(1),Y(2),Y(3),100,'g')
 quiver3(0,0,0, Z(1),Z(2),Z(3),100,'b')
 
 pose = rigid3d(R_cam_to_world',[0,0,0]);
-plotCamera("AbsolutePose",pose,"Size",20)
+plotCamera("AbsolutePose",pose,"Size",15)
+
+title("Camera Reference System")
 
 xlabel('X')
 ylabel('Y')
 zlabel('Z')
 grid on
+
+% turn axis as world reference system
+ax = gca;
+ax.XDir = "reverse";
+ax.ZDir = "reverse";
+
+%% Plot of the parallelepiped simplifying the shape of the car
+world_points = [UL_new_cam, UR_new_cam, BR_new_cam, BL_new_cam];
+x = world_points(1,:);
+y = world_points(2,:);
+z = world_points(3,:);
+
+X = R_cam_to_world(:,1);
+Y = R_cam_to_world(:,2);
+Z = R_cam_to_world(:,3);
+
+% Parallelepiped vertices
+P1 = BL_new_cam + [52.5,-15,75]';
+P2 = P1 + [-157.8,0,0]';
+P3 = P1 + [0,0,-157.8]';
+P4 = P2 + [0,0,-157.8]';
+P5 = P1 + [0,353.8,0]';
+P6 = P2 + [0,353.8,0]';
+P7 = P3 + [0,353.8,0]';
+P8 = P4 + [0,353.8,0]';
+
+back_side = [P1,P2,P4,P3]';
+fron_side = [P5,P6,P8,P7]';
+left_side = [P1,P3,P7,P5]';
+right_side = [P2,P6,P8,P4]';
+top_side = [P3,P4,P8,P7]';
+bottom_side = [P1,P2,P6,P5]';
+xPatch= [back_side(:,1), fron_side(:,1), left_side(:,1), right_side(:,1), top_side(:,1), bottom_side(:,1)];
+yPatch = [back_side(:,2), fron_side(:,2), left_side(:,2), right_side(:,2), top_side(:,2), bottom_side(:,2)];
+zPatch = [back_side(:,3), fron_side(:,3), left_side(:,3), right_side(:,3), top_side(:,3), bottom_side(:,3)];
+
+figure()
+scatter3(x,y,z, 'bo');  % world points
+hold on
+patch(xPatch,yPatch,zPatch,'c','FaceAlpha',.5);
+fill3(x,y,z,'b')
+scatter3(0,0,0, 'r+');  % camera center
+
+quiver3(0,0,0, X(1),X(2),X(3),100,'r')
+quiver3(0,0,0, Y(1),Y(2),Y(3),100,'g')
+quiver3(0,0,0, Z(1),Z(2),Z(3),100,'b')
+
+pose = rigid3d(R_cam_to_world',[0,0,0]);
+plotCamera("AbsolutePose",pose,"Size",15)
+
+title("Camera Reference System")
+
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+grid on
+axis equal
+
+xlim([-100,300])
+ylim([-20,700])
 
 % turn axis as world reference system
 ax = gca;
