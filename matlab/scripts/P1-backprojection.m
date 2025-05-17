@@ -1,81 +1,27 @@
-function plot_line(coeffs)
-    pos = get(gcf, 'Position');
-    width = pos(3);
-
-    a = coeffs(1);
-    b = coeffs(2);
-    c = coeffs(3);
-
-    x1 = 0;
-    y1 = (-c -a*x1)/b;
-    x2 = 5000;
-    y2 = (-c -a*x2)/b;
-    
-    figure(gcf)
-    line([x1,x2],[y1,y2],"Color",'y');
-end
-
-function ray = backprojection_ray(p, K)
-    p_dir = inv(K)*p;
-    ray = p_dir/norm(p_dir);
-end
-
-function [dL, dR] = derive_distance(Ldir, Rdir, inf_dir, a)
-    % compute angles inside the triangle
-    %cos_alpha = Ldir'*Rdir;
-    cos_beta = Ldir'*inf_dir;
-    cos_gamma = -Rdir'*inf_dir;
-    % to account for errors derive the third angle from the previous two
-    
-    syms b c    % distance of camera from right and left feature point respectively
-    syms cos_alpha
-    
-    % define equations of system
-    eqns = [c^2 == a^2 + b^2 - 2*a*b*cos_gamma, ...
-            a^2 == b^2 + c^2 - 2*b*c*cos_alpha, ...
-            b^2 == a^2 + c^2 - 2*a*c*cos_beta];
-    [solb, solc, cos_alpha] = solve(eqns);
-    if solb(1)<0 || solc(1)<0
-        dR = double(solb(2));
-        dL = double(solc(2));
-    else
-        dR = double(solb(1));
-        dL = double(solc(1));
-    end
-end
-
 %% Retrieve points from image
+
+addpath("matlab\functions")
 close all
 clear
-%img_path = "./imgs/pandina/iPhone/panda.jpg";
-img_path = "./imgs/pandina/nothing2a/panda_10.jpg";
-image = imread(img_path);
 
-%load('selected_points.mat', 'x', 'y');      % the order is up-left, up-right, botton-right, bottom-left
-%load("./matlab/data/iPhone_camera_params.mat") 
-load("./matlab/data/nothing2a_camera_params_LR.mat")
-K = cameraParams.Intrinsics.K;     % camear calibration amtrix
-pp = cameraParams.Intrinsics.PrincipalPoint;
+% I-PHONE
+%image_path = "/imgs/pandina/iPhone/panda.jpg";
+load("./matlab/data/iPhone_camera_params.mat") 
 
-% Undistort image
-[J, camIntrinsics] = undistortImage(image, cameraParams.Intrinsics);
-imshow(J)
-hold on;
-[x, y] = ginput(4);     % get feature points
+% NOTHING PHONE 2a
+%image_path = "/imgs/ibiza/nothing2a/seat_1.jpg";
+%load("./matlab/data/nothing2a_camera_params_LR.mat")
 
-% Plot feature points
-imshow(im2gray(J))
-hold on
-plot(x, y, 'ro', 'MarkerSize', 10, 'LineWidth', 2);
-plot(pp(1), pp(2), 'g+', 'MarkerSize', 10, 'LineWidth', 2);
+[file,location] = uigetfile({'*jpg'; '*png'});
+if isequal(file,0)
+   disp('User selected Cancel');
+else
+   abs_path = fullfile(location,file);
+   disp(['User selected ', abs_path]);
+end
 
-dy = -30;
-labels = ["UL", "UR", "BR", "BL"];
-text(x, y + dy, labels, "HorizontalAlignment","center", "VerticalAlignment","bottom", "Color",'r');
-text(pp(1), pp(2)+dy, ["Principal Point"], "HorizontalAlignment","center", "VerticalAlignment","bottom", "Color",'g')
-
-%save('selected_points.mat', 'x', 'y');
-
+K = cameraParams.Intrinsics.K;                              % camera calibration
+[x,y] = selectFeatures(abs_path, cameraParams.Intrinsics);  % feature (image) points
 %%
 UL = [x(1);y(1);1]; 
 UR = [x(2);y(2);1];
@@ -89,16 +35,16 @@ p_inf = cross(tl,pl);   % image of the point at infinity
 p_inf = p_inf/p_inf(3); % homogenize point at infinity
 
 % Backprojection rays
-inf_dir = backprojection_ray(p_inf, K);
-BL_dir = backprojection_ray(BL, K);
-BR_dir = backprojection_ray(BR, K);
-UL_dir = backprojection_ray(UL, K);
-UR_dir = backprojection_ray(UR, K);
+inf_dir = backprojectionRay(p_inf, K);
+BL_dir = backprojectionRay(BL, K);
+BR_dir = backprojectionRay(BR, K);
+UL_dir = backprojectionRay(UL, K);
+UR_dir = backprojectionRay(UR, K);
 
 % Pandina: taillights distance=114.5/122cm; license plate=53cm
 % Ibiza: taillights distance=104cm; license plate=53
-[dUL, dUR] = derive_distance(UL_dir, UR_dir, inf_dir, 114.5);
-[dBL, dBR] = derive_distance(BL_dir, BR_dir, inf_dir, 53);
+[dUL, dUR] = deriveDistance(UL_dir, UR_dir, inf_dir, 114.5);
+[dBL, dBR] = deriveDistance(BL_dir, BR_dir, inf_dir, 53);
 
 % Coordinates of the real world points in the camera ref. system
 UL_cam = dUL*UL_dir;
@@ -106,7 +52,7 @@ UR_cam = dUR*UR_dir;
 BL_cam = dBL*BL_dir;
 BR_cam = dBR*BR_dir;
 
-%% Derive Rotation matrix - as Claude suggested -
+%% Derive Rotation matrix
 X_axis = inf_dir;
 
 % Find another axis perpendicular to X_axis
