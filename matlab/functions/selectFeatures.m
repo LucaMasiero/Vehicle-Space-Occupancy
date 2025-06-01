@@ -1,60 +1,47 @@
-function points = selectFeatures(image_path)
-% SELECTFOURPOINTS - Allows user to select 4 points from an image
+function [x,y] = selectFeatures(image_path, cameraIntrinsics)
+% SELECTFEATURES - Allows user to select 4 feature points from an image and
+% plots the chosen points plus the principal camera point on the image,
+% highlighting the quadrangular shape on the rear of the car
 %
 % Syntax:  points = selectFeatures(image_path)
 %
 % Inputs:
-%    image_path - String containing the path to the image file
-%
+%   image_path - String containing the absolute path to the image file
+%   cameraIntrinsics - structure containing intrinsic parameters of the
+%                      calibrated camera
+%        
 % Outputs:
-%    points - 2x4 matrix where each column contains [x; y] coordinates of a point
+%   points - 4x2 matrix where each row contains [x, y] coordinates of a point
 %
 % Example:
-%    points = selectFourPoints('myimage.jpg');
+%   points = selectFourPoints('myimage.jpg');
 %
 % Other m-files required: none
-% Subfunctions: none
-% MAT-files required: none
+%
 
-% Read and display the image
-img = imread(image_path);
-figure;
-imshow(img);
+image = imread(image_path);             % load image
+pp = cameraIntrinsics.PrincipalPoint;   % principal point
+
+% Undistort image
+[J, ~] = undistortImage(image, cameraIntrinsics);
+imshow(J)
 hold on;
+[x, y] = ginput(4);     % get feature points
 
-% Set up the title with instructions
-title('Click on 4 points in the image. Press Enter when done.');
+% Plot feature points
+imshow(im2gray(J))
+hold on
+plot(x, y, 'ro', 'MarkerSize', 10, 'LineWidth', 2);
+plot(pp(1), pp(2), 'g*', 'MarkerSize', 10, 'LineWidth', 2);
+line(x(1:2),y(1:2), "Color",'r');
+line(x(2:3),y(2:3), "Color",'r');
+line(x(3:4),y(3:4), "Color",'r');
+line([x(4),x(1)],[y(4),y(1)], "Color",'r');
 
-% Initialize the output matrix
-points = zeros(2, 4);
-
-% Prompt user to select 4 points
-disp('Please select 4 points on the image...');
-
-% Get the 4 points from the user
-for i = 1:4
-    % Wait for the user to click
-    [x, y] = ginput(1);
-    
-    % Store the coordinates
-    points(1, i) = x;
-    points(2, i) = y;
-    
-    % Plot the selected point with a marker
-    plot(x, y, 'ro', 'MarkerSize', 10, 'LineWidth', 2);
-    
-    % Display the point number
-    text(x+10, y+10, num2str(i), 'Color', 'red', 'FontSize', 12, 'FontWeight', 'bold');
-    
-    % Inform the user
-    disp(['Point ' num2str(i) ' selected: (' num2str(x) ', ' num2str(y) ')']);
-end
-
-% Close the figure if needed (uncomment if you want the figure to close automatically)
-% close;
-
-% Display the result
-disp('Points selection complete. Result matrix:');
-disp(points);
+dy = -20;
+labels = ["UL", "UR", "BR", "BL"];
+labels = ["u1", "u2", "u3", "u4"];
+text(x, y + dy, labels, "HorizontalAlignment","center", "VerticalAlignment","bottom", "Color",'r', 'FontSize',20, 'FontWeight','bold');
+text(pp(1), pp(2)+dy, "Principal Point", "HorizontalAlignment","center", "VerticalAlignment","bottom", "Color",'g')
 
 end

@@ -22,7 +22,7 @@ end
 
 K = cameraParams.Intrinsics.K;                              % camera calibration
 [x,y] = selectFeatures(abs_path, cameraParams.Intrinsics);  % feature (image) points
-%%
+%% Compute world points position in camera coordinates
 UL = [x(1);y(1);1]; 
 UR = [x(2);y(2);1];
 BR = [x(3);y(3);1];
@@ -52,7 +52,7 @@ UR_cam = dUR*UR_dir;
 BL_cam = dBL*BL_dir;
 BR_cam = dBR*BR_dir;
 
-%% Derive Rotation matrix
+%% Derive camera rotation matrix
 X_axis = inf_dir;
 
 % Find another axis perpendicular to X_axis
@@ -72,12 +72,13 @@ R_world_to_cam = [X_axis, Y_axis, Z_axis];
 % reference system of the camera w.r.t. world reference system
 R_cam_to_world = R_world_to_cam';
 
-% Rotate camera reference like world reference to obtain a result 
-% which is more similar to what we would expect
-UL_new_cam = R_cam_to_world*UL_cam
-UR_new_cam = R_cam_to_world*UR_cam
-BL_new_cam = R_cam_to_world*BL_cam
-BR_new_cam = R_cam_to_world*BR_cam
+% Rotate points as the world reference frame to obtain a result 
+% which is more similar to what we would expect. Remember that the camera
+% Z-axis is pointing towards the principal point
+UL_new_cam = R_cam_to_world*UL_cam;
+UR_new_cam = R_cam_to_world*UR_cam;
+BL_new_cam = R_cam_to_world*BL_cam;
+BR_new_cam = R_cam_to_world*BR_cam;
 
 %% Plot camera and world points (car)
 
