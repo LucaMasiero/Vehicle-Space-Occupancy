@@ -16,6 +16,7 @@ function P = selectFeatures_p2(image_path, cameraIntrinsics)
 % Other m-files required: none
 %
 
+figure()
 image= imread(image_path);             % load image
 pp = cameraIntrinsics.PrincipalPoint;   % principal point
 
