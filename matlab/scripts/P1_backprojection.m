@@ -137,14 +137,14 @@ P7 = P3 + [0,353.8,0]';
 P8 = P4 + [0,353.8,0]';
 
 back_side = [P1,P2,P4,P3]';
-fron_side = [P5,P6,P8,P7]';
+front_side = [P5,P6,P8,P7]';
 left_side = [P1,P3,P7,P5]';
 right_side = [P2,P6,P8,P4]';
 top_side = [P3,P4,P8,P7]';
 bottom_side = [P1,P2,P6,P5]';
-xPatch= [back_side(:,1), fron_side(:,1), left_side(:,1), right_side(:,1), top_side(:,1), bottom_side(:,1)];
-yPatch = [back_side(:,2), fron_side(:,2), left_side(:,2), right_side(:,2), top_side(:,2), bottom_side(:,2)];
-zPatch = [back_side(:,3), fron_side(:,3), left_side(:,3), right_side(:,3), top_side(:,3), bottom_side(:,3)];
+xPatch= [back_side(:,1), front_side(:,1), left_side(:,1), right_side(:,1), top_side(:,1), bottom_side(:,1)];
+yPatch = [back_side(:,2), front_side(:,2), left_side(:,2), right_side(:,2), top_side(:,2), bottom_side(:,2)];
+zPatch = [back_side(:,3), front_side(:,3), left_side(:,3), right_side(:,3), top_side(:,3), bottom_side(:,3)];
 
 figure()
 scatter3(x,y,z, 'bo');  % world points
