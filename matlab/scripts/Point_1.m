@@ -101,18 +101,19 @@ quiver3(0,0,0, Y(1),Y(2),Y(3),0.5,'g');
 quiver3(0,0,0, Z(1),Z(2),Z(3),0.5,'b');
 
 % Plot WORLD reference system
-quiver3(0,0,0, 1,0,0,0.5,'y');
-quiver3(0,0,0, 0,1,0,0.5,'m');
-quiver3(0,0,0, 0,0,1,0.5,'c');
+quiver3(0,0,0, 1,0,0,0.5,'r', 'LineWidth',2);
+quiver3(0,0,0, 0,1,0,0.5,'g', 'LineWidth',2);
+quiver3(0,0,0, 0,0,1,0.5,'b', 'LineWidth',2);
 
-legend('X_{cam}', 'Y_{cam}', 'Z_{cam}', 'X_{world}', 'Y_{world}', 'Z_{world}')
+legend('X_{cam}', 'Y_{cam}', 'Z_{cam}', 'X_{world}', 'Y_{world}', 'Z_{world}', ...
+      'Location','northeastoutside')
 
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
+xlabel('X_{world}')
+ylabel('Y_{world}')
+zlabel('Z_{world}')
 
 % Turn axis as world reference system
-view(-55,45)
+view(-30,45)
 grid on
 ax = gca;
 ax.XDir = "reverse";
@@ -155,7 +156,7 @@ zlabel('Z')
 grid on
 
 % Turn axis as world reference system
-view(-45,45)
+view(-25,45)
 ax = gca;
 ax.XDir = "reverse";
 ax.ZDir = "reverse";
@@ -207,14 +208,17 @@ patch(xPatch,yPatch,zPatch,'c','FaceAlpha',.5);
 fill3(x,y,z,'b')
 
 % Plot camera reference system
-quiver3(0,0,0, X(1),X(2),X(3),100,'r')
-quiver3(0,0,0, Y(1),Y(2),Y(3),100,'g')
-quiver3(0,0,0, Z(1),Z(2),Z(3),100,'b')
+qx = quiver3(0,0,0, X(1),X(2),X(3),100,'r');
+qy = quiver3(0,0,0, Y(1),Y(2),Y(3),100,'g');
+qz = quiver3(0,0,0, Z(1),Z(2),Z(3),100,'b');
 
 % Plot camera
 scatter3(0,0,0, 'r+');  % camera center
 pose = rigid3d(R_cam_to_world',[0,0,0]);
 plotCamera("AbsolutePose",pose,"Size",15)
+
+hold off
+legend([qx,qy,qz], 'X_{cam}', 'Y_{cam}', 'Z_{cam}')
 
 xlabel('X')
 ylabel('Y')
@@ -227,6 +231,6 @@ ylim([-20,700])
 
 % Turn axis as world reference system
 ax = gca;
-view(-45,30)
+view(-30,30)
 ax.XDir = "reverse";
 ax.ZDir = "reverse";
