@@ -15,7 +15,7 @@ def canny(img):
 
     return edges
 
-def detect_license_plate(path):
+def license_plate_detection(path):
     
     img = cv2.imread(path) # load image
     
@@ -68,7 +68,6 @@ def detect_license_plate(path):
     # transform the coordinates of the bounding box to be applied on the entire image, not just the license plate region
     max_approx = max_approx + [x1,y1]
     img = cv2.imread(path)
-    cv2.drawContours(img, [max_approx], -1, (0, 0, 255), 2) 
     img = cv2.rectangle(img, (x1, y1), (x2, y2), color=(0, 0, 0), thickness=2) # draw initial bounding box
     
     if len(max_approx) == 4:
@@ -84,8 +83,6 @@ def detect_license_plate(path):
             f"Upper Right: {ur}\n"+
             f"Bottom Right: {br}\n"+
             f"Bottom Left: {bl}\n")
-        cv2.circle(img=img, center=ul, radius=5, color=(0,255, 0), thickness=-1)
-        cv2.circle(img=img, center=ur, radius=5, color=(0,255, 0), thickness=-1)
     else:
         raise Exception("It was not possible to find a four edged polygon to contain the license plate!!")
         #TODO: what to do in this case ?
@@ -93,4 +90,4 @@ def detect_license_plate(path):
     return [ul, ur, br, bl]
 
 if __name__ == "__main__":
-    detect_license_plate(sys.argv[1])
+    license_plate_detection(sys.argv[1])

@@ -9,34 +9,9 @@ import math
 import cv2
 import sys
 import os
+import numpy as np
 
 from python.modules import *
-
-def annotate_image(img_path, taillights_corners, taillights_centers, plate_corners):
-    # annotate image
-    # TODO: we can remove annotators from modules functions
-    img = cv2.imread(img_path)
-    cv2.rectangle(img,
-                    taillights_corners[0][:2],
-                    taillights_corners[0][2:4],
-                    color=(0,235,255),
-                    thickness=5) # first taillight box
-    cv2.rectangle(img,
-                    taillights_corners[1][:2],
-                    taillights_corners[1][2:4],
-                    color=(0,235,255),
-                    thickness=5) # second taillight box
-    cv2.circle(img, taillights_centers[0], radius=8, color=(1,208,6), thickness=-1) # first taillight center
-    cv2.circle(img, taillights_centers[1], radius=8, color=(1,208,6), thickness=-1) # second taillight center
-
-    cv2.line(img, plate_corners[0], plate_corners[1], color=(0,235,255), thickness=5) # license plate top segment
-    cv2.line(img, plate_corners[1], plate_corners[2], color=(0,235,255), thickness=5) # license plate right segment
-    cv2.line(img, plate_corners[2], plate_corners[3], color=(0,235,255), thickness=5) # license plate bottom segment
-    cv2.line(img, plate_corners[3], plate_corners[0], color=(0,235,255), thickness=5) # license plate left segment
-    cv2.circle(img, plate_corners[0], radius=8, color=(16,76,249), thickness=cv2.FILLED) # license plate upper left corner
-    cv2.circle(img, plate_corners[1], radius=8, color=(16,76,249), thickness=cv2.FILLED) # license plate upper right corner
-
-    return img
 
 def main(path, dir=False):
     if dir:
@@ -59,8 +34,8 @@ def main(path, dir=False):
             print(f"Detecting on image {img_path}")
 
             # detect features
-            taillights_corners, taillights_centers = detect_taillights(img_path)
-            plate_corners = detect_license_plate(img_path)
+            taillights_corners, taillights_centers = taillights_detection(img_path)
+            plate_corners = license_plate_detection(img_path)
 
             # annotate image
             annotated_img = annotate_image(img_path, taillights_corners, taillights_centers, plate_corners)
@@ -71,7 +46,7 @@ def main(path, dir=False):
             ax.axis("off")
             cnt += 1
 
-        # remove grid and axis from remaining frames
+        # remove grid and axis for remaining frames
         while cnt < plot_row_len*len(axs):
             ax = axs[cnt//plot_row_len, cnt%plot_row_len]
             ax.grid(False)
@@ -86,9 +61,12 @@ def main(path, dir=False):
         path = check_format(path) # function in modules.heic_to_jpg
 
         # detect features
-        taillights_corners, taillights_centers = detect_taillights(path)
-        plate_corners = detect_license_plate(path)
+        taillights_corners, taillights_centers = taillights_detection(path)
+        plate_corners = license_plate_detection(path)
 
+        # Check SIFT capabilities
+        SIFT(taillights_corners, path=path, image=None)
+            
         # annotate image
         annotated_img = annotate_image(path, taillights_corners, taillights_centers, plate_corners)
 
@@ -97,7 +75,7 @@ def main(path, dir=False):
         plt.show()
 
         # return features
-        return taillights_centers, plate_corners[:2]
+        return taillights_centers, plate_corners[:2] 
 
 if __name__ == "__main__":
     if len(sys.argv) > 0:
