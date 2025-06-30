@@ -76,25 +76,25 @@ car_pts = [
 ]'; 
 
 cam_pts = {};
-for f=1:3
+for k=1:3
     % Backproject image points and compute distance from camera
-    p3D = inv(K) * p_prime(:,f) / abs(n' * inv(K) * p_prime(:,f));
-    q3D = inv(K) * q_prime(:,f) / abs(n' * inv(K) * q_prime(:,f));
+    p3D = inv(K) * p_prime(:,k) / abs(n' * inv(K) * p_prime(:,k));
+    q3D = inv(K) * q_prime(:,k) / abs(n' * inv(K) * q_prime(:,k));
     
     % Compute scale factor
     w_estimate = norm(p3D - q3D);
     s = w_real/w_estimate;
     
-    cam_pts{f} = [s*p3D, s*q3D];   % 3x2 matrix
+    cam_pts{k} = [s*p3D, s*q3D];   % 3x2 matrix
     
     % Use Kabsch algorithm for image registration; (you can also use
     % Procrustes analysis)
-    [U, ~, V] = svd(cam_pts{f} * car_pts');     % compute svd of the covariance matrix
+    [U, ~, V] = svd(cam_pts{k} * car_pts');     % compute svd of the covariance matrix
     d = det(U)*det(V);                          % check if the orthogonal matrices contain a reflection
     R = U * diag([1,1,d]) * V';                 % calculate optimal rotation matrix R
     
     % Derive position of middle point between p and q in camera coordinates
-    t(:,f) = mean(cam_pts{f}, 2) - R * mean(car_pts, 2);
+    t(:,k) = mean(cam_pts{k}, 2) - R * mean(car_pts, 2);
 end
 t
 
