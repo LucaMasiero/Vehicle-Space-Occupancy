@@ -1,4 +1,4 @@
-function [p,q,m] = selectFeatures_p2(image_path, cameraIntrinsics, DLT_features)
+function [p,q,m] = selectFeatures_p2(image_path, cameraIntrinsics, DLT)
     % SELECTFEATURES_P2 - Allows the user to select two feature points in the
     % given image and plot the chosen points plus the principal camera point
     % on the image
@@ -9,6 +9,8 @@ function [p,q,m] = selectFeatures_p2(image_path, cameraIntrinsics, DLT_features)
     %   image_path - String containing the absolute path to the image file
     %   cameraIntrinsics - structure containing intrinsic parameters of the
     %                      calibrated camera
+    %   DLT - boolean value telling if we need to extract features for DLT
+    %   homography estimation (true) or not (false)
     %        
     % Outputs:
     %   points - 2x2 matrix where each row contains [x, y] coordinates of a point
@@ -34,7 +36,7 @@ function [p,q,m] = selectFeatures_p2(image_path, cameraIntrinsics, DLT_features)
     p = [p.Position(1); p.Position(2); 1];
     q = [q.Position(1); q.Position(2); 1];
 
-    if DLT_features
+    if DLT
         % homography features
         [mx, my] = getpts();
         m(:,1) = [mx(1); my(1); 1];
@@ -46,30 +48,33 @@ function [p,q,m] = selectFeatures_p2(image_path, cameraIntrinsics, DLT_features)
     % Plot feature points
     imshow(im2gray(J))
     hold on
-    dy = -20;
-    FNT_SZ = 20;
+    dy = -25;
+    dx = 25;
+    MRK_SZ = 20;
 
     % draw car feature points
-    plot(p(1), p(2), 'ro', 'MarkerSize', 5, 'LineWidth', 2);
-    plot(q(1), q(2), 'ro', 'MarkerSize', 5, 'LineWidth', 2);
-    plot(pp(1), pp(2), 'g*', 'MarkerSize', 10, 'LineWidth', 2);
+    scatter(p(1), p(2), MRK_SZ,'o','filled', 'MarkerEdgeColor','r', 'MarkerFaceColor','r');
+    scatter(q(1), q(2), MRK_SZ,'o','filled', 'MarkerEdgeColor','r', 'MarkerFaceColor','r');
     line([p(1),q(1)] ,[p(2),q(2)], "Color",'r');
-    % car features labels
-    text(p(1), p(2) + dy, 'p', 'FontSize', FNT_SZ, 'Color', 'r', 'FontWeight','bold');
-    text(q(1), q(2) + dy, 'q', 'FontSize', FNT_SZ, 'Color', 'r', 'FontWeight','bold');
-    text(pp(1), pp(2)+dy, "Principal Point", 'FontSize', FNT_SZ, "Color",'g');
+    % draw camera principal point
+    scatter(pp(1), pp(2), 2*MRK_SZ,'+','filled', 'MarkerEdgeColor','c', 'MarkerFaceColor','c');
+    % write car features labels
+    text(p(1)-4*dx, p(2)+dy, 'p', 'FontSize', MRK_SZ, 'Color', 'r', 'FontWeight','bold');
+    text(q(1)+dx, q(2)+dy, 'q', 'FontSize', MRK_SZ, 'Color', 'r', 'FontWeight','bold');
+    text(pp(1)+dx, pp(2)+dy, "Principal Point", 'FontSize', MRK_SZ, "Color",'c');
     
-    if DLT_features
+    if DLT
+        DLT_color = 'g';
+
         % draw homography feature points
-        plot(m(1,1), m(2,1),'o', 'Color','y');
-        plot(m(1,2), m(2,2),'o','Color', 'y');
-        plot(m(1,3), m(2,3),'o','Color', 'y');
-        plot(m(1,4), m(2,4),'o','Color', 'y');
-        
-        % homography features labels
-        text(m(1,1), m(2,1), 'a''', 'FontSize', FNT_SZ, 'Color', 'r');
-        text(m(1,2), m(2,2), 'b''', 'FontSize', FNT_SZ, 'Color', 'r');
-        text(m(1,3), m(2,3), 'c''', 'FontSize', FNT_SZ, 'Color', 'r');
-        text(m(1,4), m(2,4), 'd''', 'FontSize', FNT_SZ, 'Color', 'r');
-    end    
+        scatter(m(1,1), m(2,1), MRK_SZ, 'o','filled', 'MarkerEdgeColor', DLT_color, 'MarkerFaceColor', DLT_color);
+        scatter(m(1,2), m(2,2), MRK_SZ, 'o','filled', 'MarkerEdgeColor', DLT_color, 'MarkerFaceColor', DLT_color);
+        scatter(m(1,3), m(2,3), MRK_SZ, 'o','filled', 'MarkerEdgeColor', DLT_color, 'MarkerFaceColor', DLT_color);
+        scatter(m(1,4), m(2,4), MRK_SZ, 'o','filled', 'MarkerEdgeColor', DLT_color, 'MarkerFaceColor', DLT_color);
+        % write homography features labels
+        text(m(1,1)-4*dx, m(2,1)+dy, 'a', 'FontSize', MRK_SZ, 'Color', DLT_color, 'FontWeight','bold');
+        text(m(1,2)-4*dx, m(2,2)+dy, 'b', 'FontSize', MRK_SZ, 'Color', DLT_color, 'FontWeight','bold');
+        text(m(1,3)-4*dx, m(2,3)+dy, 'c', 'FontSize', MRK_SZ, 'Color', DLT_color, 'FontWeight','bold');
+        text(m(1,4)-4*dx, m(2,4)+dy, 'd', 'FontSize', MRK_SZ, 'Color', DLT_color, 'FontWeight','bold');
+    end
 end

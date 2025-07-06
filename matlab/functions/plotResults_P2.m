@@ -1,4 +1,5 @@
 function R = plotResults_P2(p, q, parallelepiped, color)
+
     % Car dimensions
     CAR_LENGTH = 3.538;    % front-to-back
     CAR_WIDTH = 1.578;     % left-to-right

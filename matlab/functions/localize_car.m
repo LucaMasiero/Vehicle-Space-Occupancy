@@ -1,4 +1,4 @@
-function [P_list, Q_list, normal] = localize_car_points(K, image_points, d, image_size, PenTest)
+function [P_list, Q_list, normal] = localize_car(K, image_points, d)
 % LOCALIZE_CAR_POINTS Estimate 3D points of car taillights from 3 frames
 %
 % Inputs:
@@ -20,11 +20,6 @@ function [P_list, Q_list, normal] = localize_car_points(K, image_points, d, imag
         % Extract points
         p = squeeze(image_points(i, 1, :));  % 2x1
         q = squeeze(image_points(i, 2, :));
-        
-        % Invert y coordinate to account for y-axis flip between image and
-        % camera frames
-        %p(2) = image_size(1) - p(2);
-        %q(2) = image_size(1) - q(2);
         
         % Backproject to rays in camera coordinates
         dp_i = K \ p;

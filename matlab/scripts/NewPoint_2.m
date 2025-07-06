@@ -1,16 +1,22 @@
 close all
 clear
 
-%%
 PEN_LENGTH = 0.15;    %[m]
 CAR_LENGTH = 1.145;   %[m]
 COLORS = ['r', 'm', 'b'];
 MRK_SZ = 20;
 
+% Here you can choose what  
 PenTest = false;
 DLTon = false;
-RotateToPiFrame = true;
+
+if PenTest
+    d = PEN_LENGTH;
+else
+    d = CAR_LENGTH;
+end
 %%
+% --------------- FEATURE EXTRACTION ---------------
 addpath("matlab\functions")
 
 % I-PHONE
@@ -24,12 +30,16 @@ load("./matlab/data/iPhone_camera_params.mat")
 K = cameraParams.Intrinsics.K;
 
 
-% Extract feature points in each frame
+% Select frames
 [file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what('imgs').path, 'MultiSelect', 'on');
 if isequal(file,0)
    disp('User Canceled Selection');
 end
 
+% Explain the user what to do
+%popUpExplain(DLTon);
+
+% Extract features from frames
 image_points = zeros(3, 2, 3);
 m = {}; % features for DLT
 for i=1:3
@@ -38,8 +48,7 @@ for i=1:3
     disp(['Frame ', num2str(i),': features selected'])
 end
 
-%%
-% Apply DLT to each frame
+% --------------- APPLY DLT IF REQUIRED ---------------
 HImage_points = zeros(3,2,3);
 if DLTon
     for i=1:3
@@ -58,7 +67,7 @@ if DLTon
     figure;
     abs_path = fullfile(location,file(1));
     img1 = imread(abs_path{1});
-    imshow(img1);
+    imshow(rgb2gray(img1));
     hold on
     for i=1:3
         % Plot extracted points
@@ -75,68 +84,22 @@ if DLTon
 end
 
 % --------------- MAIN METHOD ---------------
-if PenTest
-    d = PEN_LENGTH;
-else
-    d = CAR_LENGTH;
-end
-[P_list, Q_list, normal] = localize_car_points(K, image_points, d, cameraParams.Intrinsics.ImageSize, PenTest);
+[P_list, Q_list, normal] = localize_car(K, image_points, d);
 
 % --------------- ALIGN CAMERA Z AXIS TO NORMAL VECTOR TO PLANE π ---------------
-if RotateToPiFrame
-    R = rotationMatrixFromVectors(normal, [0;1;0]);
+R = rotationMatrixFromVectors(normal, [0;1;0]);
 
-    % Rotate points
-    for i=1:3
-        P_list(i,:) = (R*P_list(i,:)')';
-        Q_list(i,:) = (R*Q_list(i,:)')';
-    end
-
-    % Visualization: matlab Y and Z are swapped to represent camera frame
-    P_list(:,[2,3]) = P_list(:,[3,2]);
-    Q_list(:,[2,3]) = Q_list(:,[3,2]);
-end
-%% --------------- PLOT RESULTS: PARALLELEPIPED ---------------
-figure
-title("Car trajectory")
-hold on
-grid on
-
-% Plot parallelepiped (=car) for each frame
+% Rotate points
 for i=1:3
-    p = P_list(i,:);
-    p = [p(1);
-         p(2);
-         p(3)];
-    q = Q_list(i,:);
-    q = [q(1);
-         q(2);
-         q(3)];
-
-    plotResults_P2(p,q,true,COLORS(i));
+    P_list(i,:) = (R*P_list(i,:)')';
+    Q_list(i,:) = (R*Q_list(i,:)')';
 end
 
-% Plot camera
-if ~exist('R', 'var')
-    % rotate R 90 degrees to account for Y-Z switch
-    R = [1 0 0;   
-         0 0 1;
-         0 -1 0];
-end
-pose = rigid3d(R*[1 0 0; 0 0 -1; 0 1 0] , [0,0,0]);
-plotCamera("AbsolutePose",pose,"Size",0.5)
+% Visualization: matlab Y and Z are swapped to represent camera frame
+P_list(:,[2,3]) = P_list(:,[3,2]);
+Q_list(:,[2,3]) = Q_list(:,[3,2]);
 
-xlabel('X');
-ylabel('Z');    % since we have swaped Y with Z ...
-zlabel('Y');    % ... and Z with Y
-
-axis equal
-ax = gca;
-ax.ZDir = "reverse";    % reversing matlab Z-axis,
-                        % which for us is the Y-axis (vertical)
-view(45, 45);
-
-%% --------------- NORMAL VECTOR n W.R.T. CAMERA REFERENCE FRAME --------------
+% --------------- PLOT NORMAL VECTOR n W.R.T. CAMERA REFERENCE FRAME --------------
 figure()
 title("Normal to plane π")
 hold on
@@ -164,36 +127,39 @@ ax.ZDir = 'reverse';
 
 view(-35,30)
 
-%% Plot Results: just feature points and segment - for tests with PEN
+% --------------- PLOT TRAJECTORY RESULTS: CAR or PEN---------------
+if PenTest
+    % For plotting pen trajectory (i.e., test)
+    ttl = "Pen trajectory";
+    drawParallelepiped = false;
+    cameraSize = 0.08;
+else
+    % For plotting car trajectory 
+    ttl = "Car trajectory";
+    drawParallelepiped = true;
+    cameraSize = 0.5;
+end
+
 figure
-title("PenTest Results")
+title(ttl)
 hold on
 grid on
-
-% Plot parallelepiped (=car) for each frame
 for i=1:3
     p = P_list(i,:);
-    p = 10*[p(1);
-             p(2);
-             p(3)];
+    p = [p(1);
+         p(2);
+         p(3)];
     q = Q_list(i,:);
-    q = 10*[q(1);
-             q(2);
-             q(3)];
-    
-    plotResults_P2(p,q, false, COLORS(i));
+    q = [q(1);
+         q(2);
+         q(3)];
+
+    plotResults_P2(p,q,drawParallelepiped,COLORS(i));
 end
 
 % Plot camera
-if ~exist('R', 'var')
-    % rotate R 90 degrees to account for Y-Z switch
-    R = [1 0 0;   
-         0 0 1;
-         0 -1 0];
-end
-% To translate up the camera
-pose = rigid3d(R*[1 0 0; 0 0 -1; 0 1 0], [0,0,0]);
-plotCamera("AbsolutePose",pose,"Size",1)
+pose = rigid3d(R*[1 0 0; 0 0 -1; 0 1 0] , [0,0,0]);
+plotCamera("AbsolutePose",pose,"Size",cameraSize)
 
 xlabel('X');
 ylabel('Z');    % since we have swaped Y with Z ...
