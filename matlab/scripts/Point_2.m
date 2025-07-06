@@ -6,7 +6,8 @@ CAR_LENGTH = 1.145;   %[m]
 COLORS = ['r', 'm', 'b'];
 MRK_SZ = 20;
 
-% Here you can choose what  
+% Here you can choose to use pen or car frames,
+% and whether to use DLT or not 
 PenTest = false;
 DLTon = false;
 
@@ -17,6 +18,12 @@ else
 end
 %%
 % --------------- FEATURE EXTRACTION ---------------
+% ATTENTION: it is very important the the features on the car are selected
+% in the following order:
+%   - p, which is on the left taillight
+%   - q, which is on the right taillight
+%   - DLT features if needed (four points on the background)
+%
 addpath("matlab\functions")
 
 % I-PHONE
