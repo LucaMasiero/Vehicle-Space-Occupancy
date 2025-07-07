@@ -1,4 +1,4 @@
-function R = plotResults_P2(p, q, parallelepiped, color)
+function R = plotResults_p2(p, q, parallelepiped, color)
 
     % Car dimensions
     CAR_LENGTH = 3.538;    % front-to-back

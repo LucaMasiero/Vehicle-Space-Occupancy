@@ -8,8 +8,10 @@ MRK_SZ = 20;
 
 % Here you can choose to use pen or car frames,
 % and whether to use DLT or not 
-PenTest = false;
-DLTon = false;
+PenTest = true;
+DLTon = true;
+saveFeatures = false;
+UseExamples = false;
 
 if PenTest
     d = PEN_LENGTH;
@@ -26,36 +28,63 @@ end
 %
 addpath("matlab\functions")
 
+% Choose the camera
 % I-PHONE
-%image_path = "/imgs/pandina/iPhone/panda.jpg";
-load("./matlab/data/iPhone_camera_params.mat")
-
+load("./matlab/data/cameras/iPhone_camera_params.mat")
 % NOTHING PHONE 2a
-%image_path = "/imgs/ibiza/nothing2a/seat_1.jpg";
-%load("./matlab/data/nothing2a_camera_params_HR.mat")
-
+%load("./matlab/data/cameras/nothing2a_camera_params_HR.mat")
 K = cameraParams.Intrinsics.K;
 
+if UseExamples
+    % Select precooked.mat file from the desired sequence
+    [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what('imgs\').path);
+    abs_path = fullfile(location,file);
+    % Retrieve car and DLT feature points
+    feature_points = load(abs_path);
+    image_points = feature_points.image_points;
+    m =  feature_points.m;
+    disp('Extracted features from precooked file.')
 
-% Select frames
-[file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what('imgs').path, 'MultiSelect', 'on');
-if isequal(file,0)
-   disp('User Canceled Selection');
+    % Check if DLT is on but no features were saved for DLT
+    if isempty(m) && DLTon
+        DLTon = false;
+        disp("DLT was disabled since there is no saved DLT features in "+file);
+    end
+    % For precooked features always the first three features were considered
+    file = ["1.jpg", "2.jpg", "3.jpg"];
+
+    % Plot features on frames
+    for i=1:3
+        imgPath = fullfile(location, file(i));
+        plotFeaturesOnImage_p2(imgPath, squeeze(image_points(i,1,:)), ...
+                                        squeeze(image_points(i,2,:)), ...
+                                        m{i}, ...
+                                        cameraParams.Intrinsics. ...
+                                        DLTon, false);
+    end
+else
+    % Select frames
+    [file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what('imgs').path, 'MultiSelect', 'on');
+    if isequal(file,0)
+       disp('User Canceled Selection');
+    end
+    
+    % Extract features from frames
+    image_points = zeros(3, 2, 3);
+    m = {}; % features for DLT
+    for i=1:3
+        abs_path = fullfile(location,file(i));
+        [image_points(i,1,:), image_points(i,2,:), m{i}] = selectFeatures_p2(abs_path{1}, cameraParams.Intrinsics, DLTon);
+        disp(['Frame ', num2str(i),': features selected'])
+    end
+
+    if saveFeatures
+        % Save features if required
+        save(location+"\precooked.mat", "image_points", "m");
+    end
 end
 
-% Explain the user what to do
-%popUpExplain(DLTon);
-
-% Extract features from frames
-image_points = zeros(3, 2, 3);
-m = {}; % features for DLT
-for i=1:3
-    abs_path = fullfile(location,file(i));
-    [image_points(i,1,:), image_points(i,2,:), m{i}] = selectFeatures_p2(abs_path{1}, cameraParams.Intrinsics, DLTon);
-    disp(['Frame ', num2str(i),': features selected'])
-end
-
-% --------------- APPLY DLT IF REQUIRED ---------------
+%% --------------- APPLY DLT IF REQUIRED ---------------
 HImage_points = zeros(3,2,3);
 if DLTon
     for i=1:3
@@ -74,6 +103,7 @@ if DLTon
     figure;
     abs_path = fullfile(location,file(1));
     img1 = imread(abs_path{1});
+    [img1, ~] = imresize(img1, cameraParams.Intrinsics.ImageSize);
     imshow(rgb2gray(img1));
     hold on
     for i=1:3
@@ -93,7 +123,7 @@ end
 % --------------- MAIN METHOD ---------------
 [P_list, Q_list, normal] = localize_car(K, image_points, d);
 
-% --------------- ALIGN CAMERA Z AXIS TO NORMAL VECTOR TO PLANE π ---------------
+% --------------- ALIGN CAMERA Y AXIS TO NORMAL VECTOR TO PLANE π ---------------
 R = rotationMatrixFromVectors(normal, [0;1;0]);
 
 % Rotate points
@@ -161,7 +191,7 @@ for i=1:3
          q(2);
          q(3)];
 
-    plotResults_P2(p,q,drawParallelepiped,COLORS(i));
+    plotResults_p2(p,q,drawParallelepiped,COLORS(i));
 end
 
 % Plot camera
@@ -177,3 +207,5 @@ ax = gca;
 ax.ZDir = "reverse";    % reversing matlab Z-axis,
                         % which for us is the Y-axis (vertical)
 view(45, 45);
+
+normal
