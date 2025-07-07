@@ -32,7 +32,8 @@ function [P_list, Q_list, normal] = localize_car(K, image_points, d)
 
     % Step 2: Optimize the plane normal to preserve the segment length d
     % Initial guess: normal pointing forward
-    n0 = [0; 0; 1];
+    n0 = [0; 1; 1];
+    n0 = n0 / norm(n0);
     
     % Optimize using fmincon with unit norm constraint
     options = optimoptions('fmincon', 'Display', 'iter', 'Algorithm', 'sqp');
@@ -46,8 +47,9 @@ function [P_list, Q_list, normal] = localize_car(K, image_points, d)
     [normal, ~] = fmincon(problem);
     normal = normal/norm(normal);
 
-    if normal(2) < 0
-        normal = -normal;
+    % Make sure the points stays in front of the camera
+    if dot(normal, d_p(1,:)) < 0
+       normal = -normal;
     end
 
     % Step 3: Compute 3D points by intersecting rays with the plane
@@ -81,7 +83,7 @@ end
 % Cost function: Sum of squared differences from expected segment length d
 function E = segment_length_error(n, d_p, d_q, d)
     expected_normal = [0,1,0];
-    alpha = 1;
+    alpha = 2;
     E = 0;
     n = n(:);  % Ensure column vector
     for i = 1:size(d_p, 1)
