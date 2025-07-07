@@ -9,13 +9,11 @@ function [p,q,m] = selectFeatures_p2(imgPath, cameraIntrinsics, DLT)
     %   imgPath - String containing the absolute path to the image file
     %   cameraIntrinsics - structure containing intrinsic parameters of the
     %                      calibrated camera
-    %   DLT - boolean value telling if we need to extract features for DLT
+    %   DLT - boolean value specifying if we need to extract features for DLT
     %   homography estimation (true) or not (false)
     %        
     % Outputs:
     %   points - 2x2 matrix where each row contains [x, y] coordinates of a point
-    %
-    % Other m-files required: none
     %
 
     p = zeros(3,2);

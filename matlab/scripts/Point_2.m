@@ -1,15 +1,20 @@
 close all
 clear
+addpath("matlab\functions")
 
 PEN_LENGTH = 0.15;    %[m]
 CAR_LENGTH = 1.145;   %[m]
 COLORS = ['r', 'm', 'b'];
 MRK_SZ = 20;
 
-% Here you can choose to use pen or car frames,
-% and whether to use DLT or not 
-PenTest = true;
-DLTon = true;
+% Here you can choose whether:
+%   - to use pen or car frames,
+%   - to use DLT or not,
+%   - to save the extracted features,
+%   - to use 'precooked' features
+%
+PenTest = false;
+DLTon = false;
 saveFeatures = false;
 UseExamples = false;
 
@@ -18,7 +23,7 @@ if PenTest
 else
     d = CAR_LENGTH;
 end
-%%
+
 % --------------- FEATURE EXTRACTION ---------------
 % ATTENTION: it is very important the the features on the car are selected
 % in the following order:
@@ -26,18 +31,15 @@ end
 %   - q, which is on the right taillight
 %   - DLT features if needed (four points on the background)
 %
-addpath("matlab\functions")
 
 % Choose the camera
 % I-PHONE
 load("./matlab/data/cameras/iPhone_camera_params.mat")
-% NOTHING PHONE 2a
-%load("./matlab/data/cameras/nothing2a_camera_params_HR.mat")
 K = cameraParams.Intrinsics.K;
 
 if UseExamples
     % Select precooked.mat file from the desired sequence
-    [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what('imgs\').path);
+    [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what('imgs\pandina\iPhone\').path);
     abs_path = fullfile(location,file);
     % Retrieve car and DLT feature points
     feature_points = load(abs_path);
@@ -64,7 +66,7 @@ if UseExamples
     end
 else
     % Select frames
-    [file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what('imgs').path, 'MultiSelect', 'on');
+    [file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what('imgs\pandina\iPhone\').path, 'MultiSelect', 'on');
     if isequal(file,0)
        disp('User Canceled Selection');
     end
@@ -84,7 +86,7 @@ else
     end
 end
 
-%% --------------- APPLY DLT IF REQUIRED ---------------
+% --------------- APPLY DLT IF REQUIRED ---------------
 HImage_points = zeros(3,2,3);
 if DLTon
     for i=1:3
@@ -136,7 +138,7 @@ end
 P_list(:,[2,3]) = P_list(:,[3,2]);
 Q_list(:,[2,3]) = Q_list(:,[3,2]);
 
-% --------------- PLOT NORMAL VECTOR n W.R.T. CAMERA REFERENCE FRAME --------------
+% --------------- PLOT NORMAL VECTOR n w.r.t. CAMERA REFERENCE FRAME --------------
 figure()
 title("Normal to plane π")
 hold on
@@ -207,5 +209,3 @@ ax = gca;
 ax.ZDir = "reverse";    % reversing matlab Z-axis,
                         % which for us is the Y-axis (vertical)
 view(45, 45);
-
-normal

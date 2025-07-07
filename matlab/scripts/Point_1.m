@@ -1,29 +1,59 @@
-%% Retrieve points from image
-
-addpath("matlab\functions")
 close all
 clear
+addpath("matlab\functions")
 
+% Here you can choose whether:
+%   - to save the extracted features,
+%   - to use 'precooked' features
+%
+saveFeatures = false;
+UseExamples = true;
+
+% --------------- FEATURE EXTRACTION ---------------
+% ATTENTION: it is very important the the features on the car are selected
+% in clockwise order:
+%   - u1, i.e. left taillight
+%   - u2, i.e. right taillitght
+%   - u3, i.e. bottom-right corner of license plate
+%   - u4, i.e. bottom-left corner of license plate
+%
+
+% Choose the camera
 % I-PHONE
-%image_path = "/imgs/pandina/iPhone/panda.jpg";
-load("./matlab/data/iPhone_camera_params.mat") 
+load("./matlab/data/cameras/iPhone_camera_params.mat") 
+K = cameraParams.Intrinsics.K; % camera calibration
 
-% NOTHING PHONE 2a
-%image_path = "/imgs/ibiza/nothing2a/seat_1.jpg";
-%load("./matlab/data/nothing2a_camera_params_LR.mat")
+if UseExamples
+    % Select precooked.mat file for the desired image
+    [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what('imgs\pandina\iPhone\').path);
+    abs_path = fullfile(location,file);
+    % Retrieve features
+    feature_points = load(abs_path);
+    x = feature_points.x;
+    y = feature_points.y;
+    disp('Extracted features from precooked file.')
 
-[file,location] = uigetfile({'*jpg'; '*png'});
-if isequal(file,0)
-   disp('User selected Cancel');
+    % Plot feature points on the image
+    files = dir(fullfile(location, '*.jpg'));
+    imgFile = files(1); %take one image
+    imgPath = fullfile(location, imgFile.name);
+    plotFeaturesOnImage_p1(imgPath, x, y, cameraParams.Intrinsics, false);
+
 else
-   abs_path = fullfile(location,file);
-   disp(['User selected ', abs_path]);
+    % select image
+    [file,location] = uigetfile({'*.*'; '*.jpg'}, 'Folder', what('imgs\pandina\iPhone').path);
+    abs_path = fullfile(location,file);
+    
+    % Extract features
+    [x,y] = selectFeatures_p1(abs_path, cameraParams.Intrinsics);
+
+    if saveFeatures
+        % Save features if rerquired
+        save(location+"\precooked.mat", "x", "y");
+    end
 end
 
-K = cameraParams.Intrinsics.K;                                 % camera calibration
-[x,y] = selectFeatures_p1(abs_path, cameraParams.Intrinsics);  % feature (image) points
-
-%% Compute world points position in camera coordinates
+% --------------- COMPUTE FEATURE POINTS POSITION IN CAMERA REFERENCE FRAME ---------------
 UL = [x(1);y(1);1]; % left taillight
 UR = [x(2);y(2);1]; % right taillight
 BR = [x(3);y(3);1]; % bottom-right corner of plate
@@ -42,8 +72,7 @@ BR_dir = backprojectionRay(BR, K);
 UL_dir = backprojectionRay(UL, K);
 UR_dir = backprojectionRay(UR, K);
 
-% Pandina: taillights distance=114.5/122cm; license plate=53cm
-% Ibiza: taillights distance=104cm; license plate=53
+% Pandina: taillights distance=114.5cm; license plate=53cm
 [dUL, dUR] = deriveDistance(UL_dir, UR_dir, inf_dir, 114.5);
 [dBL, dBR] = deriveDistance(BL_dir, BR_dir, inf_dir, 53);
 
@@ -53,7 +82,7 @@ UR_cam = dUR*UR_dir;
 BL_cam = dBL*BL_dir;
 BR_cam = dBR*BR_dir;
 
-%% Derive camera rotation matrix
+% --------------- DERIVE CAMERA ROTATION MATRIX ---------------
 X_axis = inf_dir;
 
 % Find another axis perpendicular to X_axis
@@ -81,7 +110,7 @@ UR_new_cam = R_cam_to_world*UR_cam;
 BL_new_cam = R_cam_to_world*BL_cam;
 BR_new_cam = R_cam_to_world*BR_cam;
 
-%% Plot camera reference system w.r.t. world reference system
+% --------------- PLOT CAMERA REFERENCE FRAME w.r.t. WORLD REFERENCE FRAME ---------------
 % We applied R_cam_to_world rotation to move the points in a camera
 % reference system that is alligned with the world reference system
 % (ideally aligned with the street)
@@ -119,118 +148,9 @@ ax = gca;
 ax.XDir = "reverse";
 ax.ZDir = "reverse";
 
-%% Plot camera and world points (quadrangle)
+% --------------- PLOT WORLD POINTS QUADRANGLE ---------------
 world_points = [UL_new_cam, UR_new_cam, BR_new_cam, BL_new_cam];
-x = world_points(1,:);
-y = world_points(2,:);
-z = world_points(3,:);
+plotResults_p1(world_points, R_cam_to_world, false);
 
-X = R_cam_to_world(:,1);
-Y = R_cam_to_world(:,2);
-Z = R_cam_to_world(:,3);
-
-figure()
-hold on
-title("Camera and Quadrangle in World reference system")
-
-% Camera reference system
-qx = quiver3(0,0,0, X(1),X(2),X(3),100,'r');
-qy = quiver3(0,0,0, Y(1),Y(2),Y(3),100,'g');
-qz = quiver3(0,0,0, Z(1),Z(2),Z(3),100,'b');
-
-% Plot quadrangle
-scatter3(x,y,z, 'bo');  % world points
-fill3(x,y,z,'b')
-
-% Plot camera
-scatter3(0,0,0, 'r+');  % camera center
-pose = rigid3d(R_cam_to_world',[0,0,0]);
-plotCamera("AbsolutePose",pose,"Size",15)
-
-hold off
-legend([qx,qy,qz], 'X_{cam}', 'Y_{cam}', 'Z_{cam}')
-
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-grid on
-
-% Turn axis as world reference system
-view(-25,45)
-ax = gca;
-ax.XDir = "reverse";
-ax.ZDir = "reverse";
-
-%% Plot of the parallelepiped simplifying the shape of the car
-world_points = [UL_new_cam, UR_new_cam, BR_new_cam, BL_new_cam];
-x = world_points(1,:);
-y = world_points(2,:);
-z = world_points(3,:);
-
-X = R_cam_to_world(:,1);
-Y = R_cam_to_world(:,2);
-Z = R_cam_to_world(:,3);
-
-% Parallelepiped vertices
-width = 157.8;
-height = 157.8;
-length = 353.8;
-offset_width = 52.5;
-offset_length = -15;
-offset_height = 75;
-
-P1 = BL_new_cam + [offset_width,offset_length,offset_height]';
-P2 = P1 + [-width,0,0]';
-P3 = P1 + [0,0,-height]';
-P4 = P2 + [0,0,-height]';
-P5 = P1 + [0,length,0]';
-P6 = P2 + [0,length,0]';
-P7 = P3 + [0,length,0]';
-P8 = P4 + [0,length,0]';
-
-back_side = [P1,P2,P4,P3]';
-front_side = [P5,P6,P8,P7]';
-left_side = [P1,P3,P7,P5]';
-right_side = [P2,P6,P8,P4]';
-top_side = [P3,P4,P8,P7]';
-bottom_side = [P1,P2,P6,P5]';
-xPatch= [back_side(:,1), front_side(:,1), left_side(:,1), right_side(:,1), top_side(:,1), bottom_side(:,1)];
-yPatch = [back_side(:,2), front_side(:,2), left_side(:,2), right_side(:,2), top_side(:,2), bottom_side(:,2)];
-zPatch = [back_side(:,3), front_side(:,3), left_side(:,3), right_side(:,3), top_side(:,3), bottom_side(:,3)];
-
-figure()
-hold on
-title("Camera and Car as parallelepiped in World reference frame")
-
-% Plot quadrangle
-scatter3(x,y,z, 'bo');
-patch(xPatch,yPatch,zPatch,'c','FaceAlpha',.5);
-fill3(x,y,z,'b')
-
-% Plot camera reference system
-qx = quiver3(0,0,0, X(1),X(2),X(3),100,'r');
-qy = quiver3(0,0,0, Y(1),Y(2),Y(3),100,'g');
-qz = quiver3(0,0,0, Z(1),Z(2),Z(3),100,'b');
-
-% Plot camera
-scatter3(0,0,0, 'r+');  % camera center
-pose = rigid3d(R_cam_to_world',[0,0,0]);
-plotCamera("AbsolutePose",pose,"Size",15)
-
-hold off
-legend([qx,qy,qz], 'X_{cam}', 'Y_{cam}', 'Z_{cam}')
-
-xlabel('X')
-ylabel('Y')
-zlabel('Z')
-grid on
-axis equal
-
-xlim([-100,300])
-ylim([-20,700])
-
-% Turn axis as world reference system
-ax = gca;
-view(-30,30)
-ax.XDir = "reverse";
-ax.ZDir = "reverse";
+% --------------- PLOT PARALLELEPIPED CAR ---------------
+plotResults_p1(world_points, R_cam_to_world, true);
