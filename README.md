@@ -44,7 +44,8 @@ In the following videos you can see how to use them.
 To execute the application is sufficient to run ```matlab/scripts/Point_1.m``` or ```matlab/scripts/Point_2.m```. In both cases a small UI window will appear; this allows you to select the *running mode* fot the application.\
 \
 **Point_1**:
-- _Save feature_: if checked allows you to save the features you will select on the image. These points are saved in a file called ```precooked.mat``` inside the same directory as the image. Features are not saved in case _Use precooked examples_ is checked.
+- _Save feature_: if checked allows you to save the features you will select on the image. These points are saved in a file called ```precooked.mat``` inside the same directory as the image. Features are not saved in case _Use precooked examples_ is checked. \
+⚠️ It is better to uncheck it when extracting the features manually, that is when "*Use precooked examples*" is unchecked. ⚠️
 
 - _Use precooked examples_: if checked you can (and must) select a ```precooked.mat``` for the image you prefer. Remember that the file can be found in the same directory as the image. The saved features will be plotted on the image and the results will then be shown.
 
