@@ -20,6 +20,7 @@ function plotFeaturesOnImage_p1(imgPath, x, y, cameraIntrinsics, keepFigure)
 
     img = imread(imgPath);
     [img, ~] = imresize(img, cameraIntrinsics.ImageSize);
+    [img, ~] = undistortImage(img, cameraIntrinsics);
     imshow(im2gray(img))
     hold on
     dy = -20;

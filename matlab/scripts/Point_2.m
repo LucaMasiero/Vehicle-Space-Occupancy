@@ -8,7 +8,7 @@ COLORS = ['r', 'm', 'b'];
 MRK_SZ = 20;
 
 % Here you can choose whether:
-%   - to save the extracted features,
+%   - to save the extracted features,   
 %   - to use 'precooked' features,
 %   - to use pen or car frames,
 %   - to use DLT or not
