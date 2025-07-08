@@ -13,15 +13,17 @@ MRK_SZ = 20;
 %   - to save the extracted features,
 %   - to use 'precooked' features
 %
-PenTest = false;
+PenTest = true;
 DLTon = false;
 saveFeatures = false;
 UseExamples = false;
 
 if PenTest
     d = PEN_LENGTH;
+    imgsLocation = "imgs\P2\iPhone\pen";
 else
     d = CAR_LENGTH;
+    imgsLocation = "imgs\P2\iPhone\pandina";
 end
 
 % --------------- FEATURE EXTRACTION ---------------
@@ -39,7 +41,13 @@ K = cameraParams.Intrinsics.K;
 
 if UseExamples
     % Select precooked.mat file from the desired sequence
-    [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what('imgs\pandina\iPhone\').path);
+    [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what(imgsLocation).path);
+    if file == 0
+        % Cancel action
+        disp('Canceled selection')
+        return
+    end
+
     abs_path = fullfile(location,file);
     % Retrieve car and DLT feature points
     feature_points = load(abs_path);
@@ -61,14 +69,16 @@ if UseExamples
         plotFeaturesOnImage_p2(imgPath, squeeze(image_points(i,1,:)), ...
                                         squeeze(image_points(i,2,:)), ...
                                         m{i}, ...
-                                        cameraParams.Intrinsics. ...
+                                        cameraParams.Intrinsics, ...
                                         DLTon, false);
     end
 else
     % Select frames
-    [file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what('imgs\pandina\iPhone\').path, 'MultiSelect', 'on');
-    if isequal(file,0)
-       disp('User Canceled Selection');
+    [file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what('imgs\P2\iPhone\').path, 'MultiSelect', 'on');
+    if file == 0
+        % Cancel action
+        disp('Canceled selection')
+        return
     end
     
     % Extract features from frames

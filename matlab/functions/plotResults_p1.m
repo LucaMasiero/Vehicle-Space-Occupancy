@@ -53,9 +53,7 @@ function plotResults_p1(worldPoints, R, parallelepiped)
     
     xlim([-300,300])
     
-    if parallelepiped
-        axis equal
-    end
+    axis equal
     view(-30,30)
     % Turn axis as world reference system
     ax = gca;

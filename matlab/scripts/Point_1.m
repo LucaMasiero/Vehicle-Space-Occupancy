@@ -7,7 +7,7 @@ addpath("matlab\functions")
 %   - to use 'precooked' features
 %
 saveFeatures = false;
-UseExamples = true;
+UseExamples = false;
 
 % --------------- FEATURE EXTRACTION ---------------
 % ATTENTION: it is very important the the features on the car are selected
@@ -25,7 +25,13 @@ K = cameraParams.Intrinsics.K; % camera calibration
 
 if UseExamples
     % Select precooked.mat file for the desired image
-    [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what('imgs\pandina\iPhone\').path);
+    [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what('imgs\P1\iPhone\pandina\').path);
+    if file == 0
+        % Cancel action
+        disp('Canceled selection')
+        return
+    end
+
     abs_path = fullfile(location,file);
     % Retrieve features
     feature_points = load(abs_path);
@@ -41,7 +47,12 @@ if UseExamples
 
 else
     % select image
-    [file,location] = uigetfile({'*.*'; '*.jpg'}, 'Folder', what('imgs\pandina\iPhone').path);
+    [file,location] = uigetfile({'*.*'; '*.jpg'}, 'Folder', what('imgs\P1\iPhone\pandina\').path);
+    if file == 0
+        % Cancel action
+        disp('Canceled selection')
+        return
+    end
     abs_path = fullfile(location,file);
     
     % Extract features
