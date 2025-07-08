@@ -68,7 +68,7 @@ For **point 1** you should extract the features of the quadrangle clockwise, sta
 3. bottom-right corner of the license plate
 4. bottom-left corner of the license plate
 
-<img src="imgs/readme/P1-features.png" width="500">
+<img width="612" height="459" alt="Image" src="https://github.com/user-attachments/assets/7b99e955-385b-449a-a6f5-0521537ec663" />
 
 For **point 2** you should first select the car features from left to right:
 1. left taillight (*p*)
@@ -76,7 +76,7 @@ For **point 2** you should first select the car features from left to right:
 
 and then, if needed, the four feature points used for DLT (*refer to the report for more details*), whichever you want as long as they are selected in each frame with the same order.
 
-<img src="imgs/readme/P2-features.png" width="500">\
+<img width="612" height="459" alt="Image" src="https://github.com/user-attachments/assets/e4339289-4e6b-4c27-aa88-4ebb5e33bb3f" />\
 \
 \
 The following videos shows how to use the application.
