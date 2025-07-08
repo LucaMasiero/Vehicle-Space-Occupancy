@@ -1,7 +1,2 @@
-python/_pycache_/
-python/scripts/_pycache_/
-python/modules/_pycache_/
-
-matlab/scripts/*.asv
-
-.vscode/
+__pycache__/
+.vscode
