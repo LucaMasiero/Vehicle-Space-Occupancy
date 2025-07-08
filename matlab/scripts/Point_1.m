@@ -5,9 +5,11 @@ addpath("matlab\functions")
 % Here you can choose whether:
 %   - to save the extracted features,
 %   - to use 'precooked' features
-%
-saveFeatures = false;
-UseExamples = false;
+[SaveFeatures, UseExamples, ~, ~] = UIVariableSelection("P1");
+if isnan(SaveFeatures)|| isnan(UseExamples)
+    disp('UI closed.')
+    return
+end
 
 % --------------- FEATURE EXTRACTION ---------------
 % ATTENTION: it is very important the the features on the car are selected
@@ -58,7 +60,7 @@ else
     % Extract features
     [x,y] = selectFeatures_p1(abs_path, cameraParams.Intrinsics);
 
-    if saveFeatures
+    if SaveFeatures
         % Save features if rerquired
         save(location+"\precooked.mat", "x", "y");
     end

@@ -8,15 +8,15 @@ COLORS = ['r', 'm', 'b'];
 MRK_SZ = 20;
 
 % Here you can choose whether:
-%   - to use pen or car frames,
-%   - to use DLT or not,
 %   - to save the extracted features,
-%   - to use 'precooked' features
-%
-PenTest = true;
-DLTon = false;
-saveFeatures = false;
-UseExamples = false;
+%   - to use 'precooked' features,
+%   - to use pen or car frames,
+%   - to use DLT or not
+[SaveFeatures, UseExamples, PenTest, DLTon] = UIVariableSelection("P2");
+if isnan(SaveFeatures)|| isnan(UseExamples) || isnan(PenTest) || isnan(DLTon)
+    disp('UI closed.')
+    return
+end
 
 if PenTest
     d = PEN_LENGTH;
@@ -90,7 +90,7 @@ else
         disp(['Frame ', num2str(i),': features selected'])
     end
 
-    if saveFeatures
+    if SaveFeatures
         % Save features if required
         save(location+"\precooked.mat", "image_points", "m");
     end
