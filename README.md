@@ -1,1 +1,67 @@
-# Vehicle-Space-Occupancy
+# <p style="color:#9EC6F3">Vehicle Space occupancy</p>
+*A.A. 2024-2025* \
+Image Analysis and Computer Vision (IACV) \
+Department of Electronics, Information and Bioengineering\
+**Ermelinda Giulivo** - **Luca Masiero**
+\
+\
+The goal of this project is to develop an algorithm capable of estimating the 3D position of a vehicle from images captured by a fixed camera. The project is divided into two main objectives. The first focuses on localizing the vehicle using a single image by leveraging geometric constraints and known calibration parameters. The second, instead, uses three consecutive frames in order to estimate the trajectory of the vehicle over time. Both tasks assume the availability of prior knowledge—such as the camera’s intrinsic matrix and the fixed real-world distance between two identified feature points on the vehicle—to constrain and guide the reconstruction proces 
+
+## Repository structure
+The **main scripts** solving the two points of our project are stored in the ```matlab\scripts``` directory. In the ```matlab\function``` directory you can find every function used in the main scripts. \
+\
+```matlab\data\cameras``` stores the camera parameters obtained as a result of the calibration procedure. Here we have only one (i.e., iPhone), but in principle we can add any camera's parameters and update the main scripts when loading the parameters. Obviously, the iamges used then should have been taken with the same camera whose parameters we are going to load.\
+\
+The images used for testing are all stored in the ```img\``` directory, which has the following structure: 
+```
+imgs
+    ↪ P1
+    |   ↪ iPhone
+    |       ↪ pandina
+    |           ↪ image-1
+    |           |   ↪ panda.jpg
+    |           |   ↪ precooked.mat
+    |           ↪ ...        
+    ↪ P2
+        ↪ iPhone
+            ↪ pandina
+            |   ↪ sequence-1
+            |   |   ↪ 1.jpg
+            |   |   ↪ 2.jpg
+            |   |   ↪ 3.jpg
+            |   |   ↪ precooked.mat
+            |   ↪ ...        
+            ↪ pen
+```
+The first point needs only one image to execute, then each ```image-i``` folder contains one image (always called *panda.jpg*).\
+The second point need three images to execute, then each ```sequence-i``` folder contains at least three images (always called *1.jpg*,*2.jpg* and *3.jpg*).
+
+#### What about the ```precooked.mat``` files ?
+Well, they are matlab structures containing pre-extracted feature points, and they are very convenient for having a quick look at what the algorithms do and what are their results.\
+In the following videos you can see how to use them.
+
+## How to use
+
+#### ⚠️ A word of caution on feature extraction ⚠️
+As written in each one of the two main scripts, when manually selecting the features, is very important to respect a given order, so that the program is able to understand which point has been extracted.\
+\
+For **point 1** you should extract the features of the quadrangle clockwise, starting from the top-left feature:
+1. left taillight
+2. right taillight
+3. bottom-right corner of the license plate
+4. bottom-left corner of the license plate
+
+<img src="imgs/readme/P1-features.png" width="500">
+
+For **point 2** you should first select the car features from left to right:
+1. left taillight (*p*)
+2. right taillight (*q*)
+
+and then, if needed, the four feature points used for DLT (*refer to the report for more details*), whichever you want as long as they are selected in each frame with the same order.
+
+<img src="imgs/readme/P2-features.png" width="500">
+
+## Framework and Toolbox
+There are a couple of Toolbox used by our matlab application:
+- [Image Processing Toolbox](https://it.mathworks.com/products/image-processing.html)
+- [Global Optimization Toolbox](https://it.mathworks.com/products/global-optimization.html)
