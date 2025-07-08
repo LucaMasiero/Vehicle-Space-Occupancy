@@ -81,10 +81,10 @@ and then, if needed, the four feature points used for DLT (*refer to the report 
 The following videos shows how to use the application.\
 \
 **Video 1**: executing _Point_1_ and using "precooked" features\
-<video src="https://github.com/user-attachments/assets/2bc471cf-6066-460d-8e70-19aac2560805"></video>
+<video src="https://github.com/user-attachments/assets/023590a7-f0bb-4343-b9fc-2333998ae176"></video>
 
 **Video 2**: executing _Point_2_ and using "precooked" features with DLT\
-<video src="https://github.com/user-attachments/assets/023590a7-f0bb-4343-b9fc-2333998ae176"></video>
+<video src="https://github.com/user-attachments/assets/2bc471cf-6066-460d-8e70-19aac2560805"></video>
 
 **Video 3**: executing _Point_2_ and extracting features manually (no precooked examples)and no DLT\
 <video src="https://github.com/user-attachments/assets/2fa5f07c-8f66-4f44-8ee0-8165aff45a24"></video>
