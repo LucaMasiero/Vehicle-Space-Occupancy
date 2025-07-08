@@ -54,7 +54,7 @@ To execute the application is sufficient to run ```matlab/scripts/Point_1.m``` o
 
 - _Use precooked examples_: it follows the same principle as for Point_1
 
-- _PenTesting_: if checked you can (and must) select a sequence of frames of the pen instead of the car. The application will automatically open the File Explorer in the right folder, which is ```imgs/P2/iPhone/pen/```
+- _PenTesting_: if checked you can (and must) select a sequence of frames of the pen instead of the car. The application will automatically open the File Explorer window in the right folder, which is ```imgs/P2/iPhone/pen/```. If not selected the folder you will end up in will be instead ```imgs/P2/iPhone/pandina/```.
 
 - _Apply DLT_: if checked the application requires you to select four features in each frame for DLT based frame alignment or, if you have selected _Use precooked examples_ it will plot on the frames also the DLT feature points. 
 
@@ -75,7 +75,19 @@ For **point 2** you should first select the car features from left to right:
 
 and then, if needed, the four feature points used for DLT (*refer to the report for more details*), whichever you want as long as they are selected in each frame with the same order.
 
-<img src="imgs/readme/P2-features.png" width="500">
+<img src="imgs/readme/P2-features.png" width="500">\
+\
+\
+The following videos shows how to use the application.\
+
+**Video 1**: executing _Point_1_ and using "precooked" features\
+<video src="imgs/readme/P1-precooked.mp4"></video>
+
+**Video 2**: executing _Point_2_ and using "precooked" features with DLT\
+<video src="imgs/readme/P2-DLT-precooked.mp4"></video>
+
+**Video 3**: executing _Point_2_ and extracting features manually (no precooked examples)and no DLT\
+<video src="imgs/readme/P2-noDLT-manual.mp4"></video>
 
 ## Framework and Toolbox
 There are a couple of Toolbox used by our matlab application:
