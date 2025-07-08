@@ -86,7 +86,7 @@ executing _Point_1_; "Use precooked examples"=true\
 
 #### Video2:
 executing _Point_1_; "Use precooked examples"=false;\
-<video src=""></video>
+<video src="https://github.com/user-attachments/assets/39f763cb-6ca5-4d23-9bc1-bb9189bd85e2"></video>
 
 #### Video 3:
 executing _Point_2_; "Use precooked examples"=true; "Apply DLT"=true\
