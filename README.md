@@ -44,7 +44,8 @@ In the following videos you can see how to use them.
 To execute the application is sufficient to run ```matlab/scripts/Point_1.m``` or ```matlab/scripts/Point_2.m```. In both cases a small UI window will appear; this allows you to select the *running mode* fot the application.\
 \
 **Point_1**:
-- _Save feature_: if checked allows you to save the features you will select on the image. These points are saved in a file called ```precooked.mat``` inside the same directory as the image. Features are not saved in case _Use precooked examples_ is checked.
+- _Save feature_: if checked allows you to save the features you will select on the image. These points are saved in a file called ```precooked.mat``` inside the same directory as the image. Features are not saved in case _Use precooked examples_ is checked. \
+⚠️ It is better to uncheck it when extracting the features manually, that is when "*Use precooked examples*" is unchecked. ⚠️
 
 - _Use precooked examples_: if checked you can (and must) select a ```precooked.mat``` for the image you prefer. Remember that the file can be found in the same directory as the image. The saved features will be plotted on the image and the results will then be shown.
 
@@ -78,17 +79,25 @@ and then, if needed, the four feature points used for DLT (*refer to the report 
 <img src="imgs/readme/P2-features.png" width="500">\
 \
 \
-The following videos shows how to use the application.\
+The following videos shows how to use the application.
 
-**Video 1**: executing _Point_1_ and using "precooked" features\
-<video src="imgs/readme/P1-precooked.mp4"></video>
+#### Video 1:
+executing _Point_1_; "Use precooked examples"=true\
+<video src="https://github.com/user-attachments/assets/023590a7-f0bb-4343-b9fc-2333998ae176"></video>
 
-**Video 2**: executing _Point_2_ and using "precooked" features with DLT\
-<video src="imgs/readme/P2-DLT-precooked.mp4"></video>
+#### Video2:
+executing _Point_1_; "Use precooked examples"=false;\
+<video src="https://github.com/user-attachments/assets/39f763cb-6ca5-4d23-9bc1-bb9189bd85e2"></video>
 
-**Video 3**: executing _Point_2_ and extracting features manually (no precooked examples)and no DLT\
-<video src="imgs/readme/P2-noDLT-manual.mp4"></video>
+#### Video 3:
+executing _Point_2_; "Use precooked examples"=true; "Apply DLT"=true\
+<video src="https://github.com/user-attachments/assets/2bc471cf-6066-460d-8e70-19aac2560805"></video>
 
+#### Video 4:
+executing _Point_2_; "Use precooked examples"=false (manual feature extraction); "Apply DLT"=false\
+<video src="https://github.com/user-attachments/assets/2fa5f07c-8f66-4f44-8ee0-8165aff45a24"></video>
+
+ 
 ## Framework and Toolbox
 There are a couple of Toolbox used by our matlab application:
 - [Image Processing Toolbox](https://it.mathworks.com/products/image-processing.html)
