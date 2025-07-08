@@ -79,15 +79,15 @@ and then, if needed, the four feature points used for DLT (*refer to the report 
 \
 \
 The following videos shows how to use the application.\
-
+\
 **Video 1**: executing _Point_1_ and using "precooked" features\
-<video src="imgs/readme/P1-precooked.mp4"></video>
+<video src="https://github.com/user-attachments/assets/36eff9d9-42b6-4fa3-a73e-08702026a07e"></video>
 
 **Video 2**: executing _Point_2_ and using "precooked" features with DLT\
-<video src="imgs/readme/P2-DLT-precooked.mp4"></video>
+<video src=""></video>
 
 **Video 3**: executing _Point_2_ and extracting features manually (no precooked examples)and no DLT\
-<video src="imgs/readme/P2-noDLT-manual.mp4"></video>
+<video src=""></video>
 
 ## Framework and Toolbox
 There are a couple of Toolbox used by our matlab application:
