@@ -42,7 +42,7 @@ K = cameraParams.Intrinsics.K;
 if UseExamples
     % Select precooked.mat file from the desired sequence
     [file,location] = uigetfile({'*.*'; '*.mat'}, 'Folder', what(imgsLocation).path);
-    if file == 0
+    if location == 0
         % Cancel action
         disp('Canceled selection')
         return
@@ -74,8 +74,8 @@ if UseExamples
     end
 else
     % Select frames
-    [file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what('imgs\P2\iPhone\').path, 'MultiSelect', 'on');
-    if file == 0
+    [file,location] = uigetfile({'*.*'; '*jpg'}, 'Folder', what(imgsLocation).path, 'MultiSelect', 'on');
+    if location == 0
         % Cancel action
         disp('Canceled selection')
         return

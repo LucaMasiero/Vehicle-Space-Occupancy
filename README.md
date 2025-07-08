@@ -41,6 +41,22 @@ Well, they are matlab structures containing pre-extracted feature points, and th
 In the following videos you can see how to use them.
 
 ## How to use
+To execute the application is sufficient to run ```matlab/scripts/Point_1.m``` or ```matlab/scripts/Point_2.m```. In both cases a small UI window will appear; this allows you to select the *running mode* fot the application.\
+\
+**Point_1**:
+- _Save feature_: if checked allows you to save the features you will select on the image. These points are saved in a file called ```precooked.mat``` inside the same directory as the image. Features are not saved in case _Use precooked examples_ is checked.
+
+- _Use precooked examples_: if checked you can (and must) select a ```precooked.mat``` for the image you prefer. Remember that the file can be found in the same directory as the image. The saved features will be plotted on the image and the results will then be shown.
+
+\
+**Point_2**:
+- _Save feature_: it follows the same principle as for Point_1
+
+- _Use precooked examples_: it follows the same principle as for Point_1
+
+- _PenTesting_: if checked you can (and must) select a sequence of frames of the pen instead of the car. The application will automatically open the File Explorer in the right folder, which is ```imgs/P2/iPhone/pen/```
+
+- _Apply DLT_: if checked the application requires you to select four features in each frame for DLT based frame alignment or, if you have selected _Use precooked examples_ it will plot on the frames also the DLT feature points. 
 
 #### ⚠️ A word of caution on feature extraction ⚠️
 As written in each one of the two main scripts, when manually selecting the features, is very important to respect a given order, so that the program is able to understand which point has been extracted.\
