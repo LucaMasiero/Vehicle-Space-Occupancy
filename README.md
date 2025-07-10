@@ -1,8 +1,9 @@
 # <p style="color:#9EC6F3">Vehicle Space occupancy</p>
+[**Ermelinda Giulivo**](https://github.com/ErmelindaGiulivo) - [**Luca Masiero**](https://github.com/LucaMasiero)\
 *A.A. 2024-2025* \
-Image Analysis and Computer Vision (IACV) \
-Department of Electronics, Information and Bioengineering\
-**Ermelinda Giulivo** - **Luca Masiero**
+Course of *Image Analysis and Computer Vision (IACV)* \
+*Department of Electronics, Information and Bioengineering (DEIB) - Politecnico di Milano*\
+**Grade: 30/30**
 \
 \
 The goal of this project is to develop an algorithm capable of estimating the 3D position of a vehicle from images captured by a fixed camera. The project is divided into two main objectives. The first focuses on localizing the vehicle using a single image by leveraging geometric constraints and known calibration parameters. The second, instead, uses three consecutive frames in order to estimate the trajectory of the vehicle over time. Both tasks assume the availability of prior knowledge—such as the camera’s intrinsic matrix and the fixed real-world distance between two identified feature points on the vehicle—to constrain and guide the reconstruction proces 
