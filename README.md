@@ -6,7 +6,7 @@ Course of *Image Analysis and Computer Vision (IACV)* \
 **Grade: 30/30**
 \
 \
-The goal of this project is to develop an algorithm capable of estimating the 3D position of a vehicle from images captured by a fixed camera. The project is divided into two main objectives. The first focuses on localizing the vehicle using a single image by leveraging geometric constraints and known calibration parameters. The second, instead, uses three consecutive frames in order to estimate the trajectory of the vehicle over time. Both tasks assume the availability of prior knowledge—such as the camera’s intrinsic matrix and the fixed real-world distance between two identified feature points on the vehicle—to constrain and guide the reconstruction proces 
+The goal of this project is to develop an algorithm capable of estimating the 3D position of a vehicle from images captured by a fixed camera. The project is divided into two main objectives. The first focuses on localizing the vehicle using a single image by leveraging geometric constraints and known calibration parameters. The second, instead, uses three consecutive frames in order to estimate the trajectory of the vehicle over time. Both tasks assume the availability of prior knowledge—such as the camera’s intrinsic matrix and the fixed real-world distance between two identified feature points on the vehicle—to constrain and guide the reconstruction process.
 
 ## Repository structure
 The **main scripts** solving the two points of our project are stored in the ```matlab\scripts``` directory. In the ```matlab\function``` directory you can find every function used in the main scripts. \
